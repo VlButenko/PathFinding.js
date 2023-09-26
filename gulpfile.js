@@ -24,6 +24,13 @@ gulp.task('browserify', ['clean'], function(cb) {
     .pipe(gulp.dest('./lib/'), cb);
 });
 
+gulp.task('browserify-visual', ['clean'], function(cb) {
+    return gulp.src('./src/PathFinding.js')
+        .pipe(browserify({ standalone: 'PF' }))
+        .pipe(rename('pathfinding-browser.min.js'))
+        .pipe(gulp.dest('./visual/lib'), cb);
+});
+
 gulp.task('uglify', ['browserify'], function(cb) {
     return gulp.src('./lib/pathfinding-browserified.js')
     .pipe(uglify())

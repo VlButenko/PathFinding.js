@@ -16,6 +16,7 @@ var DiagonalMovement = require('../core/DiagonalMovement');
  *     (defaults to manhattan).
  * @param {number} opt.weight Weight to apply to the heuristic to allow for
  *     suboptimal paths, in order to speed up the search.
+ * @param {number} opt.distanceToWall
  */
 function AStarFinder(opt) {
     opt = opt || {};
@@ -24,6 +25,7 @@ function AStarFinder(opt) {
     this.heuristic = opt.heuristic || Heuristic.manhattan;
     this.weight = opt.weight || 1;
     this.diagonalMovement = opt.diagonalMovement;
+    this.distanceToWall = opt.distanceToWall;
 
     if (!this.diagonalMovement) {
         if (!this.allowDiagonal) {
@@ -60,6 +62,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
         heuristic = this.heuristic,
         diagonalMovement = this.diagonalMovement,
         weight = this.weight,
+        distanceToWall = this.distanceToWall,
         abs = Math.abs, SQRT2 = Math.SQRT2,
         node, neighbors, neighbor, i, l, x, y, ng;
 
@@ -83,7 +86,12 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
         }
 
         // get neigbours of the current node
-        neighbors = grid.getNeighbors(node, diagonalMovement);
+        if (distanceToWall) {
+            neighbors = grid.getNeighborsWithDistance(node, diagonalMovement, distanceToWall);
+        } else {
+            neighbors = grid.getNeighbors(node, diagonalMovement);
+        }
+
         for (i = 0, l = neighbors.length; i < l; ++i) {
             neighbor = neighbors[i];
 

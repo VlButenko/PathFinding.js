@@ -59,7 +59,8 @@ var Panel = {
                     allowDiagonal: allowDiagonal,
                     dontCrossCorners: dontCrossCorners,
                     heuristic: PF.Heuristic[heuristic],
-                    weight: weight
+                    weight: weight,
+                    distanceToWall: 3,
                 });
             }
             break;

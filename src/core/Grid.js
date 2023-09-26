@@ -92,6 +92,10 @@ Grid.prototype.getNodeAt = function(x, y) {
  * @param {number} y - The y coordinate of the node.
  * @return {boolean} - The walkability of the node.
  */
+Grid.prototype.isWalkableAt2 = function(x, y) {
+    return this.isInside(x, y) && this.nodes[y][x].walkable && this.isWalkableNearest(x, y, 3);
+};
+
 Grid.prototype.isWalkableAt = function(x, y) {
     return this.isInside(x, y) && this.nodes[y][x].walkable;
 };
@@ -214,6 +218,92 @@ Grid.prototype.getNeighbors = function(node, diagonalMovement) {
 
     return neighbors;
 };
+
+Grid.prototype.getNeighborsWithDistance = function(node, diagonalMovement, distanceToNotWalkable) {
+    var x = node.x,
+        y = node.y,
+        neighbors = [],
+        s0 = false, d0 = false,
+        s1 = false, d1 = false,
+        s2 = false, d2 = false,
+        s3 = false, d3 = false,
+        nodes = this.nodes;
+
+    // ↑
+    if (this.isWalkableNearest(x, y-1, distanceToNotWalkable)) {
+        neighbors.push(nodes[y - 1][x]);
+        s0 = true;
+    }
+    // →
+    if (this.isWalkableNearest(x + 1, y, distanceToNotWalkable)) {
+        neighbors.push(nodes[y][x + 1]);
+        s1 = true;
+    }
+    // ↓
+    if (this.isWalkableNearest(x, y + 1, distanceToNotWalkable)) {
+        neighbors.push(nodes[y + 1][x]);
+        s2 = true;
+    }
+    // ←
+    if (this.isWalkableNearest(x - 1, y, distanceToNotWalkable)) {
+        neighbors.push(nodes[y][x - 1]);
+        s3 = true;
+    }
+
+    if (diagonalMovement === DiagonalMovement.Never) {
+        return neighbors;
+    }
+
+    if (diagonalMovement === DiagonalMovement.OnlyWhenNoObstacles) {
+        d0 = s3 && s0;
+        d1 = s0 && s1;
+        d2 = s1 && s2;
+        d3 = s2 && s3;
+    } else if (diagonalMovement === DiagonalMovement.IfAtMostOneObstacle) {
+        d0 = s3 || s0;
+        d1 = s0 || s1;
+        d2 = s1 || s2;
+        d3 = s2 || s3;
+    } else if (diagonalMovement === DiagonalMovement.Always) {
+        d0 = true;
+        d1 = true;
+        d2 = true;
+        d3 = true;
+    } else {
+        throw new Error('Incorrect value of diagonalMovement');
+    }
+
+    // ↖
+    if (d0 && this.isWalkableAt(x - 1, y - 1)) {
+        neighbors.push(nodes[y - 1][x - 1]);
+    }
+    // ↗
+    if (d1 && this.isWalkableAt(x + 1, y - 1)) {
+        neighbors.push(nodes[y - 1][x + 1]);
+    }
+    // ↘
+    if (d2 && this.isWalkableAt(x + 1, y + 1)) {
+        neighbors.push(nodes[y + 1][x + 1]);
+    }
+    // ↙
+    if (d3 && this.isWalkableAt(x - 1, y + 1)) {
+        neighbors.push(nodes[y + 1][x - 1]);
+    }
+
+    return neighbors;
+};
+
+Grid.prototype.isWalkableNearest = function(x, y, distance) {
+    for (let i = -distance; i < distance; i++) {
+        for (let j = -distance; j < distance; j++) {
+            if (!this.isWalkableAt(x+j, y+i)) {
+                return false
+            }
+        }
+    }
+
+    return true
+}
 
 
 /**
