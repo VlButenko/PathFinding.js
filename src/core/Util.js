@@ -176,6 +176,56 @@ function smoothenPath(grid, path) {
 }
 exports.smoothenPath = smoothenPath;
 
+/**
+ * Smoothen the give path with distance to blocked field.
+ * The original path will not be modified; a new path will be returned.
+ * @param {PF.Grid} grid
+ * @param {Array<Array<number>>} path The path
+ * @param {number} distance The distance to blockde field
+ */
+function smoothenPathWithDistanceToBlocked(grid, path, distance) {
+    var len = path.length,
+        x0 = path[0][0],        // path start x
+        y0 = path[0][1],        // path start y
+        x1 = path[len - 1][0],  // path end x
+        y1 = path[len - 1][1],  // path end y
+        sx, sy,                 // current start coordinate
+        ex, ey,                 // current end coordinate
+        newPath,
+        i, j, coord, line, testCoord, blocked;
+
+    sx = x0;
+    sy = y0;
+    newPath = [[sx, sy]];
+
+    for (i = 2; i < len; ++i) {
+        coord = path[i];
+        ex = coord[0];
+        ey = coord[1];
+        line = interpolate(sx, sy, ex, ey);
+
+        blocked = false;
+        for (j = 1; j < line.length; ++j) {
+            testCoord = line[j];
+
+            if (!grid.isWalkableNearest(testCoord[0], testCoord[1], distance)) {
+                blocked = true;
+                break;
+            }
+        }
+        if (blocked) {
+            var lastValidCoord = path[i - 1];
+            newPath.push(lastValidCoord);
+            sx = lastValidCoord[0];
+            sy = lastValidCoord[1];
+        }
+    }
+    newPath.push([x1, y1]);
+
+    return newPath;
+}
+exports.smoothenPathWithDistanceToBlocked = smoothenPathWithDistanceToBlocked;
+
 
 /**
  * Compress a path, remove redundant nodes without altering the shape

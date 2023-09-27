@@ -138,6 +138,9 @@ $.extend(Controller, {
         this.path = finder.findPath(
             this.startX, this.startY, this.endX, this.endY, grid
         );
+        console.log("path: ", this.path)
+        this.path = PF.Util.smoothenPathWithDistanceToBlocked(grid, this.path, 3)
+        console.log("smoothen: ", this.path)
         this.operationCount = this.operations.length;
         timeEnd = window.performance ? performance.now() : Date.now();
         this.timeSpent = (timeEnd - timeStart).toFixed(4);
