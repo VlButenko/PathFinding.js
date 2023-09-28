@@ -92,7 +92,11 @@ Grid.prototype.getNodeAt = function(x, y) {
  * @param {number} y - The y coordinate of the node.
  * @return {boolean} - The walkability of the node.
  */
-Grid.prototype.isWalkableAt = function(x, y) {
+Grid.prototype.isWalkableAt = function(x, y, distanceToObstacles) {
+    if (distanceToObstacles) {
+        return this.isWalkableNearest(x, y, distanceToObstacles)
+    }
+
     return this.isInside(x, y) && this.nodes[y][x].walkable;
 };
 
@@ -160,7 +164,7 @@ Grid.prototype.setWalkableAt = function(x, y, walkable) {
  * @param {Node} node
  * @param {DiagonalMovement} diagonalMovement
  */
-Grid.prototype.getNeighbors = function(node, diagonalMovement) {
+Grid.prototype.getNeighbors = function(node, diagonalMovement, distanceToObstacles) {
     var x = node.x,
         y = node.y,
         neighbors = [],
@@ -171,22 +175,22 @@ Grid.prototype.getNeighbors = function(node, diagonalMovement) {
         nodes = this.nodes;
 
     // ↑
-    if (this.isWalkableAt(x, y - 1)) {
+    if (this.isWalkableAt(x, y - 1, distanceToObstacles)) {
         neighbors.push(nodes[y - 1][x]);
         s0 = true;
     }
     // →
-    if (this.isWalkableAt(x + 1, y)) {
+    if (this.isWalkableAt(x + 1, y, distanceToObstacles)) {
         neighbors.push(nodes[y][x + 1]);
         s1 = true;
     }
     // ↓
-    if (this.isWalkableAt(x, y + 1)) {
+    if (this.isWalkableAt(x, y + 1, distanceToObstacles)) {
         neighbors.push(nodes[y + 1][x]);
         s2 = true;
     }
     // ←
-    if (this.isWalkableAt(x - 1, y)) {
+    if (this.isWalkableAt(x - 1, y, distanceToObstacles)) {
         neighbors.push(nodes[y][x - 1]);
         s3 = true;
     }
@@ -215,19 +219,19 @@ Grid.prototype.getNeighbors = function(node, diagonalMovement) {
     }
 
     // ↖
-    if (d0 && this.isWalkableAt(x - 1, y - 1)) {
+    if (d0 && this.isWalkableAt(x - 1, y - 1, distanceToObstacles)) {
         neighbors.push(nodes[y - 1][x - 1]);
     }
     // ↗
-    if (d1 && this.isWalkableAt(x + 1, y - 1)) {
+    if (d1 && this.isWalkableAt(x + 1, y - 1, distanceToObstacles)) {
         neighbors.push(nodes[y - 1][x + 1]);
     }
     // ↘
-    if (d2 && this.isWalkableAt(x + 1, y + 1)) {
+    if (d2 && this.isWalkableAt(x + 1, y + 1, distanceToObstacles)) {
         neighbors.push(nodes[y + 1][x + 1]);
     }
     // ↙
-    if (d3 && this.isWalkableAt(x - 1, y + 1)) {
+    if (d3 && this.isWalkableAt(x - 1, y + 1, distanceToObstacles)) {
         neighbors.push(nodes[y + 1][x - 1]);
     }
 

@@ -14,6 +14,7 @@ var JPFMoveDiagonallyIfAtMostOneObstacle = require('./JPFMoveDiagonallyIfAtMostO
  *     (defaults to manhattan).
  * @param {DiagonalMovement} opt.diagonalMovement Condition under which diagonal
  *      movement will be allowed.
+ * @param {number} opt.distanceToObstacles Distance to obstacles in path
  */
 function JumpPointFinder(opt) {
     opt = opt || {};

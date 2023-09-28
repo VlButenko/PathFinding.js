@@ -148,7 +148,8 @@ var Panel = {
             finder = new PF.JumpPointFinder({
               trackJumpRecursion: trackRecursion,
               heuristic: PF.Heuristic[heuristic],
-              diagonalMovement: PF.DiagonalMovement.Never
+              diagonalMovement: PF.DiagonalMovement.Never,
+              distanceToObstacles: 1,
             });
             break;
         case 'ida_header':

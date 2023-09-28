@@ -24,9 +24,9 @@ JPFNeverMoveDiagonally.prototype.constructor = JPFNeverMoveDiagonally;
  */
 JPFNeverMoveDiagonally.prototype._jump = function(x, y, px, py) {
     var grid = this.grid,
-        dx = x - px, dy = y - py;
+        dx = x - px, dy = y - py, distanceToObstacles = this.distanceToObstacles
 
-    if (!grid.isWalkableAt(x, y)) {
+    if (!grid.isWalkableAt(x, y, distanceToObstacles)) {
         return null;
     }
 
@@ -39,14 +39,14 @@ JPFNeverMoveDiagonally.prototype._jump = function(x, y, px, py) {
     }
 
     if (dx !== 0) {
-        if ((grid.isWalkableAt(x, y - 1) && !grid.isWalkableAt(x - dx, y - 1)) ||
-            (grid.isWalkableAt(x, y + 1) && !grid.isWalkableAt(x - dx, y + 1))) {
+        if ((grid.isWalkableAt(x, y - 1, distanceToObstacles) && !grid.isWalkableAt(x - dx, y - 1, distanceToObstacles)) ||
+            (grid.isWalkableAt(x, y + 1, distanceToObstacles) && !grid.isWalkableAt(x - dx, y + 1))) {
             return [x, y];
         }
     }
     else if (dy !== 0) {
-        if ((grid.isWalkableAt(x - 1, y) && !grid.isWalkableAt(x - 1, y - dy)) ||
-            (grid.isWalkableAt(x + 1, y) && !grid.isWalkableAt(x + 1, y - dy))) {
+        if ((grid.isWalkableAt(x - 1, y, distanceToObstacles) && !grid.isWalkableAt(x - 1, y - dy, distanceToObstacles)) ||
+            (grid.isWalkableAt(x + 1, y, distanceToObstacles) && !grid.isWalkableAt(x + 1, y - dy, distanceToObstacles))) {
             return [x, y];
         }
         //When moving vertically, must check for horizontal jump points
@@ -72,7 +72,8 @@ JPFNeverMoveDiagonally.prototype._findNeighbors = function(node) {
         x = node.x, y = node.y,
         grid = this.grid,
         px, py, nx, ny, dx, dy,
-        neighbors = [], neighborNodes, neighborNode, i, l;
+        neighbors = [], neighborNodes, neighborNode, i, l,
+        distanceToObstacles = this.distanceToObstacles;
 
     // directed pruning: can ignore most neighbors, unless forced.
     if (parent) {
@@ -83,31 +84,31 @@ JPFNeverMoveDiagonally.prototype._findNeighbors = function(node) {
         dy = (y - py) / Math.max(Math.abs(y - py), 1);
 
         if (dx !== 0) {
-            if (grid.isWalkableAt(x, y - 1)) {
+            if (grid.isWalkableAt(x, y - 1, distanceToObstacles)) {
                 neighbors.push([x, y - 1]);
             }
-            if (grid.isWalkableAt(x, y + 1)) {
+            if (grid.isWalkableAt(x, y + 1, distanceToObstacles)) {
                 neighbors.push([x, y + 1]);
             }
-            if (grid.isWalkableAt(x + dx, y)) {
+            if (grid.isWalkableAt(x + dx, y, distanceToObstacles)) {
                 neighbors.push([x + dx, y]);
             }
         }
         else if (dy !== 0) {
-            if (grid.isWalkableAt(x - 1, y)) {
+            if (grid.isWalkableAt(x - 1, y, distanceToObstacles)) {
                 neighbors.push([x - 1, y]);
             }
-            if (grid.isWalkableAt(x + 1, y)) {
+            if (grid.isWalkableAt(x + 1, y, distanceToObstacles)) {
                 neighbors.push([x + 1, y]);
             }
-            if (grid.isWalkableAt(x, y + dy)) {
+            if (grid.isWalkableAt(x, y + dy, distanceToObstacles)) {
                 neighbors.push([x, y + dy]);
             }
         }
     }
     // return all neighbors
     else {
-        neighborNodes = grid.getNeighbors(node, DiagonalMovement.Never);
+        neighborNodes = grid.getNeighbors(node, DiagonalMovement.Never, distanceToObstacles);
         for (i = 0, l = neighborNodes.length; i < l; ++i) {
             neighborNode = neighborNodes[i];
             neighbors.push([neighborNode.x, neighborNode.y]);
