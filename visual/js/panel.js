@@ -60,7 +60,7 @@ var Panel = {
                     dontCrossCorners: dontCrossCorners,
                     heuristic: PF.Heuristic[heuristic],
                     weight: weight,
-                    distanceToWall: 3,
+                    distanceToWall: 5,
                 });
             }
             break;
@@ -97,7 +97,8 @@ var Panel = {
                 finder = new PF.BiBestFirstFinder({
                     allowDiagonal: allowDiagonal,
                     dontCrossCorners: dontCrossCorners,
-                    heuristic: PF.Heuristic[heuristic]
+                    heuristic: PF.Heuristic[heuristic],
+                    distanceToWall: 3,
                 });
             } else {
                 finder = new PF.BestFirstFinder({
